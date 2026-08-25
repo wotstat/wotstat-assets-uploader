@@ -1,0 +1,1 @@
+# wotstat-assets-uploader
