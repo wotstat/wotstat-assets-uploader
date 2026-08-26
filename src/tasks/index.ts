@@ -11,7 +11,6 @@ export async function load(root: string) {
 
   const snapshot = await parseSnapshotVersion(root)
 
-  console.log(snapshot)
   const i18n = await generateI18n(root, snapshot)
 
   // try { await loadArenas(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
