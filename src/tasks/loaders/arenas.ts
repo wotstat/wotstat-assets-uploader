@@ -1,7 +1,6 @@
 // import { clickhouse } from '@/db'
-import { GetText } from '@/utils/GetText'
 import { parseStringPromise } from 'xml2js'
-import { filenameAndExtension, generateI18n, I18n, lcMessagesPath, type Snapshot as Snapshot } from '../../utils/utils'
+import { filenameAndExtension, I18n, type Snapshot as Snapshot } from '../../utils/utils'
 import { Glob } from 'bun'
 import { S3Client } from '@aws-sdk/client-s3'
 import { ddsToImage } from '@/utils/ddsToImage'
