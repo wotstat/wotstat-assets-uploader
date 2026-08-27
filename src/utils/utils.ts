@@ -10,6 +10,7 @@ export type Snapshot = {
   target: string
   realm: string
   languages: string[]
+  vendor: 'mt' | 'wot'
 }
 
 export async function parseSnapshotVersion(root: string): Promise<Snapshot> {
@@ -25,26 +26,28 @@ export async function parseSnapshotVersion(root: string): Promise<Snapshot> {
   const parts = main.split('.').slice(1)
   const comp = Number.parseInt(parts.map(t => t.padStart(2, '0')).join('')) * 1e5 + Number.parseInt(hash)
 
+  const realm = versionMeta['version.xml'].meta.realm
+  const vendor = realm == 'PT_RU' || realm == 'RU' ? 'mt' : 'wot'
+
   return {
     full: version,
     version: parts.join('.'),
     hash,
     comparable: comp,
     target: snapshot.source.target,
-    realm: versionMeta['version.xml'].meta.realm,
-    languages: snapshot.source.languages
+    realm,
+    languages: snapshot.source.languages,
+    vendor
   }
 }
 
 export function lcMessagesPath(snapshot: Snapshot, language: string) {
-  if (snapshot.realm == 'PT_RU' || snapshot.realm == 'RU')
-    return `sources/base/res/text/${language.toLocaleLowerCase()}/lc_messages`
-
+  if (snapshot.vendor === 'mt') return `sources/base/res/text/${language.toLocaleLowerCase()}/lc_messages`
   return `sources/locales/${language}/res/text/lc_messages`
 }
 
 export class I18n {
-  constructor(private translations: Map<string, MultiLanguageGetText>) { }
+  constructor(readonly translations: Map<string, MultiLanguageGetText>) { }
 
   public getTranslation(msg: string) {
     if (!msg.startsWith('#')) throw new Error(`Invalid msgid: ${msg}`)
@@ -53,6 +56,32 @@ export class I18n {
 
     const gettext = this.translations.get(file!)
     return Object.fromEntries(gettext!.getTranslationForAllLLanguages(key).entries())
+  }
+
+  public getSingleLineTranslation(msg: string) {
+    if (!msg.startsWith('#')) throw new Error(`Invalid msgid: ${msg}`)
+    const [file, ...rest] = msg.slice(1).split(':')
+    const key = rest.join(':')
+
+    const gettext = this.translations.get(file!)
+    return Object.fromEntries(gettext!.getSingleLineTranslationForAllLLanguages(key).entries())
+  }
+
+  public getAllTranslations(file: string) {
+    const gettext = this.translations.get(file)
+    if (!gettext) throw new Error(`Localization file not found: ${file}`)
+
+    const keys = new Set(
+      Array.from(gettext.getAll().values())
+        .flatMap(language => Array.from(language.getAll().keys()))
+    )
+
+    return new Map(
+      Array.from(keys).map(key => [
+        key,
+        Object.fromEntries(gettext.getTranslationForAllLLanguages(key).entries())
+      ])
+    )
   }
 }
 

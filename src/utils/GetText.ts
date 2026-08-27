@@ -1,4 +1,28 @@
 
+function decodePoString(value: string) {
+  let decoded = ''
+
+  for (let i = 0; i < value.length; i++) {
+    const character = value[i]!
+
+    if (character !== '\\' || i === value.length - 1) {
+      decoded += character
+      continue
+    }
+
+    const escapedCharacter = value[i + 1]!
+    if (escapedCharacter === '\\' || escapedCharacter === '"') {
+      decoded += escapedCharacter
+      i++
+      continue
+    }
+
+    decoded += character
+  }
+
+  return decoded
+}
+
 function parsePo(po: string) {
   const translations = po.split('msgid')
 
@@ -6,13 +30,13 @@ function parsePo(po: string) {
     .filter(t => t.includes('msgstr'))
     .map(t => {
       const splitted = t.split('msgstr')
-      const msgid = splitted[0]!.trim().slice(1, -1)
+      const msgid = decodePoString(splitted[0]!.trim().slice(1, -1))
 
       const lines = splitted[1]!
         .split('\n')
         .map(l => l.trim())
         .filter(l => l.length > 0)
-        .map(l => l.slice(1, -1))
+        .map(l => decodePoString(l.slice(1, -1)))
         .filter(l => l.length > 0)
 
       const msgstr = lines.join('\n')
@@ -69,7 +93,7 @@ export class GetText {
 
 export class MultiLanguageGetText {
 
-  constructor(private translations: Map<string, GetText>) { }
+  constructor(readonly translations: Map<string, GetText>) { }
 
   public extend(language: string, getText: GetText) {
     if (!this.translations.has(language)) {
@@ -99,6 +123,14 @@ export class MultiLanguageGetText {
     const translations = new Map<string, string>()
     for (const [language, getText] of this.translations.entries()) {
       translations.set(language, getText.getTranslation(msg, fallback))
+    }
+    return translations
+  }
+
+  public getSingleLineTranslationForAllLLanguages(msg: string, fallback?: string) {
+    const translations = new Map<string, string>()
+    for (const [language, getText] of this.translations.entries()) {
+      translations.set(language, getText.getSingleLineTranslation(msg, fallback))
     }
     return translations
   }
