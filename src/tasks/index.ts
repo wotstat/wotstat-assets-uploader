@@ -9,6 +9,7 @@ import { load as loadSkills } from './loaders/skills'
 import { load as loadArtefacts } from './loaders/artefacts'
 import { load as loadCustomizations } from './loaders/customizations'
 import { load as loadGameVersion } from './loaders/gameVersions'
+import { load as loadVehicles } from './loaders/vehicles'
 
 
 const s3Client = new S3Client()
@@ -26,6 +27,7 @@ export async function load(root: string) {
   // try { await loadSkills(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
   // try { await loadArtefacts(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
   // try { await loadCustomizations(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
-  try { await loadGameVersion(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
+  // try { await loadGameVersion(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
+  try { await loadVehicles(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
 
 }
