@@ -69,7 +69,7 @@ export class I18n {
 
   public getAllTranslations(file: string) {
     const gettext = this.translations.get(file)
-    if (!gettext) throw new Error(`Localization file not found: ${file}`)
+    if (!gettext) return new Map<string, Record<string, string>>()
 
     const keys = new Set(
       Array.from(gettext.getAll().values())
