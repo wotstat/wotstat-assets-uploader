@@ -12,6 +12,7 @@ import { load as loadGameVersion } from './loaders/gameVersions'
 import { load as loadEquipments } from './loaders/equipments'
 import { load as loadOptionalDevices } from './loaders/optionalDevices'
 import { load as loadVehicles } from './loaders/vehicles/index'
+import { load as loadEquipmentsAndDevicesIcons } from './loaders/equipmentsAndDevicesIcons'
 
 
 const s3Client = new S3Client()
@@ -31,7 +32,8 @@ export async function load(root: string) {
   // try { await loadCustomizations(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
   // try { await loadGameVersion(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
   // try { await loadEquipments(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
-  try { await loadOptionalDevices(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
+  // try { await loadOptionalDevices(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
+  try { await loadEquipmentsAndDevicesIcons(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
   // try { await loadVehicles(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
 
 }
