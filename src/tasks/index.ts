@@ -9,7 +9,7 @@ import { load as loadSkills } from './loaders/skills'
 import { load as loadArtefacts } from './loaders/artefacts'
 import { load as loadCustomizations } from './loaders/customizations'
 import { load as loadGameVersion } from './loaders/gameVersions'
-import { load as loadVehicles } from './loaders/vehicles'
+import { load as loadVehicles } from './loaders/vehicles/index'
 
 
 const s3Client = new S3Client()
