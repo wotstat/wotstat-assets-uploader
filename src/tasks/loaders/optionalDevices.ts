@@ -104,6 +104,6 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
     values: insertValues,
     format: 'JSONEachRow'
   })
-  console.log(`OptionalDevices inserted`)
+  console.log(`OptionalDevices inserted (${insertValues.length} lines)`)
 
 }

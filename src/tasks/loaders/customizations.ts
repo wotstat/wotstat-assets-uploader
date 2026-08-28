@@ -47,5 +47,5 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
     values: insertValues,
     format: 'JSONEachRow'
   })
-  console.log(`Customizations inserted`)
+  console.log(`Customizations inserted (${insertValues.length} lines)`)
 }

@@ -132,6 +132,8 @@ function parseGameplayMeta(arena: Arena) {
 export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket: S3Client) {
   const upload = uploader(snapshot, bucket)
 
+  console.log('Uploading arenas...');
+
   const data = await Bun.file(`${root}/sources/base/res/scripts/arena_defs/_list_.xml`).text()
   const arenas = await parseStringPromise(data, { explicitArray: false, explicitRoot: false }) as ArenasList
 
@@ -192,7 +194,9 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
   const promises: Promise<void>[] = []
   for (const minimap of minimaps) {
     const name = minimap.replace('spaces/', '').replace('.dds', '')
-    const img = await ddsToImage(Bun.file(`${root}/sources/base/res/${minimap}`))
+    const file = Bun.file(`${root}/sources/base/res/${minimap}`)
+    if (!await file.exists()) continue
+    const img = await ddsToImage(file)
 
     promises.push(upload(`arenas/minimap-medium/${name}.png`, await img.png().toBuffer()))
     promises.push(upload(`arenas/minimap-medium/${name}.webp`, await img.webp({ quality: 90 }).toBuffer()))
@@ -221,7 +225,7 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
   }
 
   await Promise.all(promises)
-
+  console.log(`Arenas uploaded (${promises.length / 2}x2 files)`);
 
   const v2t = (t: { x: number, y: number }) => ([t.x, t.y])
 
@@ -253,15 +257,13 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
     'poi.type': t.poi?.map(t => t.type) ?? [],
   }))
 
-
   console.log('Inserting arenas...')
-
-  // console.log(insertValues);
 
   await clickhouse.insert({
     table: 'WOT.Arenas',
     values: insertValues,
     format: 'JSONEachRow'
   })
-  console.log('Arena inserted')
+
+  console.log(`Inserted arenas (${insertValues.length} lines)`)
 }

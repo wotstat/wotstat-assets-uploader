@@ -7,6 +7,9 @@ import { filenameAndExtension, I18n, type Snapshot as Snapshot } from '../../uti
 export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket: S3Client) {
 
   const upload = uploader(snapshot, bucket)
+  const uploading: Promise<void>[] = []
+
+  console.log(`Uploading shells icons...`);
 
   const files = [...new Glob(`${root}/sources/base/res/gui/maps/shop/shells/360x270/*.png`).scanSync()]
   for (const filePath of files) {
@@ -15,7 +18,10 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
     const { nameWithoutExt: name, ext } = filenameAndExtension(filePath)
 
     const webpBytes = await file.image().webp({ quality: 80 }).bytes()
-    await upload(`shells/${name}.png`, await file.bytes())
-    await upload(`shells/${name}.webp`, webpBytes)
+    uploading.push(upload(`shells/${name}.png`, await file.bytes()))
+    uploading.push(upload(`shells/${name}.webp`, webpBytes))
   }
+
+  await Promise.all(uploading)
+  console.log(`Shells icons uploaded (${uploading.length / 2}x2 files)`);
 }

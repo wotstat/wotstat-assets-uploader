@@ -105,5 +105,5 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
     values: insertValues,
     format: 'JSONEachRow'
   })
-  console.log(`Equipments inserted`)
+  console.log(`Equipments inserted (${insertValues.length} lines)`)
 }

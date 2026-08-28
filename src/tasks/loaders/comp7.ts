@@ -74,9 +74,12 @@ async function processWot(root: string, snapshot: Snapshot, i18n: I18n, bucket: 
 }
 
 export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket: S3Client) {
+  console.log(`Uploading comp7 ranks and role skills...`);
+
   const { uploadings } = snapshot.vendor === 'mt'
     ? await processMt(root, snapshot, i18n, bucket)
     : await processWot(root, snapshot, i18n, bucket)
 
   await Promise.all(uploadings)
+  console.log(`Comp7 ranks and role skills uploaded (${uploadings.length / 2}x2 files)`);
 }

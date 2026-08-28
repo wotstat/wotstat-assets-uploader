@@ -29,6 +29,6 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
     values: insertValues,
     format: 'JSONEachRow'
   })
-  console.log(`Artefacts inserted`)
+  console.log(`Artefacts inserted (${insertValues.length} lines)`)
 
 }
