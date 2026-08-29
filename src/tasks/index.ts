@@ -55,15 +55,26 @@ export async function load(root: string) {
 
   for (const table of [
     'WOT.vehicles_latest_mv',
-    'WOT.vehicles_localization_mv',
-    'WOT.arenas_localization_mv',
     'WOT.arenas_latest_mv',
-    'WOT.lootboxes_localization_mv',
-    'WOT.artefacts_localization_mv',
+    'WOT.lootboxes_latest_mv',
+    'WOT.artefacts_latest_mv',
+    'WOT.customizations_latest_mv',
     'WOT.game_versions_latest_mv',
     'WOT.optional_devices_latest_mv',
     'WOT.equipments_latest_mv'
   ]) {
     await clickhouse.exec({ query: `system refresh view ${table}` })
+  }
+
+  for (const dictionary of [
+    'WOT.ArtefactsLocalizationDictionary',
+    'WOT.ArenasLocalizationDictionary',
+    'WOT.CustomizationsLocalizationDictionary',
+    'WOT.EquipmentsLocalizationDictionary',
+    'WOT.LootboxesLocalizationDictionary',
+    'WOT.OptionalDevicesLocalizationDictionary',
+    'WOT.VehiclesLocalizationDictionary'
+  ]) {
+    await clickhouse.exec({ query: `system reload dictionary ${dictionary}` })
   }
 }
