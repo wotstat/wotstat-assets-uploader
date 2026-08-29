@@ -1,5 +1,6 @@
 import { generateI18n, parseSnapshotVersion } from '../utils/utils'
 import { S3Client } from '@aws-sdk/client-s3'
+import { clickhouse } from '@/db'
 
 import { load as loadArenas } from './loaders/arenas'
 import { load as loadLootboxes } from './loaders/lootboxes'
@@ -47,7 +48,22 @@ export async function load(root: string) {
     }
   }
 
+
   if (failures.length > 0) {
     throw new AggregateError(failures, `${failures.length} uploader task(s) failed`)
+  }
+
+  for (const table of [
+    'WOT.vehicles_latest_mv',
+    'WOT.vehicles_localization_mv',
+    'WOT.arenas_localization_mv',
+    'WOT.arenas_latest_mv',
+    'WOT.lootboxes_localization_mv',
+    'WOT.artefacts_localization_mv',
+    'WOT.game_versions_latest_mv',
+    'WOT.optional_devices_latest_mv',
+    'WOT.equipments_latest_mv'
+  ]) {
+    await clickhouse.exec({ query: `system refresh view ${table}` })
   }
 }
