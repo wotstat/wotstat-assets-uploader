@@ -40,3 +40,7 @@ It must also define these variables:
 - `AWS_BUCKET`
 
 `DATA_DIR` is supplied by the pipeline and must not be stored as a secret.
+
+S3 staging objects use flat namespaces below the temporary `tmp/` root. Production targets write
+to `tmp/wot/` or `tmp/mt/`; `wot-common-test` and `mt-public-test` write to `tmp/wot-test/` and
+`tmp/mt-test/` respectively. Uploads are not serialized across targets.

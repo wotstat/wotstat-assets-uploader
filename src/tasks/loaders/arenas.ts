@@ -132,7 +132,7 @@ function parseGameplayMeta(arena: Arena) {
 export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket: S3Client) {
   const upload = uploader(snapshot, bucket)
 
-  console.log('Uploading arenas...');
+  console.log('Uploading arenas...')
 
   const data = await Bun.file(`${root}/sources/base/res/scripts/arena_defs/_list_.xml`).text()
   const arenas = await parseStringPromise(data, { explicitArray: false, explicitRoot: false }) as ArenasList
@@ -225,7 +225,7 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
   }
 
   await Promise.all(promises)
-  console.log(`Arenas uploaded (${promises.length / 2}x2 files)`);
+  console.log(`Arenas uploaded (${promises.length / 2}x2 files)`)
 
   const v2t = (t: { x: number, y: number }) => ([t.x, t.y])
 

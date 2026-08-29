@@ -126,13 +126,13 @@ export async function loadMt(root: string, snapshot: Snapshot, i18n: I18n, bucke
 
 export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket: S3Client) {
 
-  console.log(`Uploading lootboxes...`);
+  console.log('Uploading lootboxes...')
   const { uploading, lootboxes } = snapshot.vendor === 'wot'
     ? await loadWot(root, snapshot, i18n, bucket)
     : await loadMt(root, snapshot, i18n, bucket)
 
   await Promise.all(uploading)
-  console.log(`Lootboxes uploaded (${uploading.length / 2}x2 files)`);
+  console.log(`Lootboxes uploaded (${uploading.length / 2}x2 files)`)
 
   const lootboxesInserted = lootboxes.map(key => {
     const tag = key.split('/').at(-1)

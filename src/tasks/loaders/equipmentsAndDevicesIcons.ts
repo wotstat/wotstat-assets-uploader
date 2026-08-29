@@ -17,7 +17,7 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
 
   const upload = uploader(snapshot, bucket)
 
-  console.log(`Uploading OptionalDevices and Equipments icons...`);
+  console.log('Uploading OptionalDevices and Equipments icons...')
 
   const equipmentsData = await Bun.file(`${root}/sources/base/res/scripts/item_defs/vehicles/common/equipments.xml`).text()
   const equipments = await parseStringPromise(equipmentsData, { explicitArray: false, explicitRoot: false }) as List
@@ -94,5 +94,5 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
     await Promise.all(uploading)
   }
 
-  console.log(`OptionalDevices and Equipments icons uploaded`);
+  console.log('OptionalDevices and Equipments icons uploaded')
 }

@@ -9,7 +9,7 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
   const upload = uploader(snapshot, bucket)
   const uploading: Promise<void>[] = []
 
-  console.log(`Uploading shells icons...`);
+  console.log('Uploading shells icons...')
 
   const files = [...new Glob(`${root}/sources/base/res/gui/maps/shop/shells/360x270/*.png`).scanSync()]
   for (const filePath of files) {
@@ -23,5 +23,5 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
   }
 
   await Promise.all(uploading)
-  console.log(`Shells icons uploaded (${uploading.length / 2}x2 files)`);
+  console.log(`Shells icons uploaded (${uploading.length / 2}x2 files)`)
 }

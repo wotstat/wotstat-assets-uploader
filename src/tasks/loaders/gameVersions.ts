@@ -36,6 +36,6 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
     ],
     format: 'JSONEachRow'
   })
-  console.log(`Game version inserted`)
+  console.log('Game version inserted')
 
 }

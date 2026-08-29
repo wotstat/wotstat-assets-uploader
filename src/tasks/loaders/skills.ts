@@ -4,7 +4,7 @@ import { uploader } from '@/utils/assetsUploader'
 import { filenameAndExtension, type I18n, type Snapshot } from '@/utils/utils'
 
 export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket: S3Client) {
-  console.log(`Uploading skills icons...`);
+  console.log('Uploading skills icons...')
 
 
   const upload = uploader(snapshot, bucket)
@@ -39,6 +39,6 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
 
   await Promise.all(uploadings)
 
-  console.log(`Uploaded ${uploadings.length / 2}x2 skills icons.`);
+  console.log(`Uploaded ${uploadings.length / 2}x2 skills icons.`)
 
 }

@@ -19,9 +19,10 @@ function contentTypeGenerate(path: string) {
 
 export function uploader(snapshot: Snapshot, bucket: S3Client) {
   const version = snapshot.version
-  const game = (() => {
-    if (snapshot.target == 'mt-ru' || snapshot.target == 'mt-public-test') return 'mt'
-    return 'wot'
+  const namespace = (() => {
+    if (snapshot.target === 'wot-common-test') return 'wot-test'
+    if (snapshot.target === 'mt-public-test') return 'mt-test'
+    return snapshot.vendor
   })()
 
   return async (path: string, content: PutObjectCommand['input']['Body']) => {
@@ -31,7 +32,7 @@ export function uploader(snapshot: Snapshot, bucket: S3Client) {
     await bucket.send(new PutObjectCommand({
       ...defaultConfig,
       ContentType: contentType,
-      Key: `tmp/${game}/latest/${path}`,
+      Key: `tmp/${namespace}/latest/${path}`,
       Body: content,
       CacheControl: 'max-age=3600' // 1 hour
     }))
@@ -39,7 +40,7 @@ export function uploader(snapshot: Snapshot, bucket: S3Client) {
     await bucket.send(new PutObjectCommand({
       ...defaultConfig,
       ContentType: contentType,
-      Key: `tmp/${game}/${version}/${path}`,
+      Key: `tmp/${namespace}/${version}/${path}`,
       Body: content,
       CacheControl: 'max-age=31622400' // 1 year
     }))

@@ -31,10 +31,6 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: wotstat-assets-uploader-${{ startsWith(inputs.target, 'mt-') && 'mt' || 'wot' }}
-  cancel-in-progress: false
-
 jobs:
   upload:
     name: Upload ${{ inputs.target }}
