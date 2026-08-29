@@ -24,7 +24,7 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
     table: 'WOT.GameVersions',
     values: [
       {
-        region: `tmp-${snapshot.realm}`,
+        region: `${snapshot.realm}`,
         gameVersionFull: snapshot.full,
         gameVersion: snapshot.version,
         gameVersionHash: snapshot.hash,

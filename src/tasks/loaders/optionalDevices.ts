@@ -89,7 +89,7 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
   }))
 
   const insertValues = res.map(t => ({
-    region: `tmp-${snapshot.realm}`,
+    region: `${snapshot.realm}`,
     gameVersionFull: snapshot.full,
     gameVersion: snapshot.version,
     gameVersionHash: snapshot.hash,

@@ -137,7 +137,7 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
   const lootboxesInserted = lootboxes.map(key => {
     const tag = key.split('/').at(-1)
     return {
-      region: `tmp-${snapshot.realm}`,
+      region: `${snapshot.realm}`,
       gameVersionFull: snapshot.full,
       gameVersion: snapshot.version,
       gameVersionHash: snapshot.hash,

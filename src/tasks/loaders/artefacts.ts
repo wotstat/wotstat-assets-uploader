@@ -10,7 +10,7 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
   ].filter(([key]) => key.endsWith('/name') || key.endsWith('/name/noTemplate'))
 
   const insertValues = artefacts.map(t => ({
-    region: `tmp-${snapshot.realm}`,
+    region: `${snapshot.realm}`,
     gameVersionFull: snapshot.full,
     gameVersion: snapshot.version,
     gameVersionHash: snapshot.hash,

@@ -101,7 +101,7 @@ export async function load(root: string, snapshot: Snapshot, i18n: I18n, bucket:
   const vehicles = await getVehicles(root, i18n)
   const vehiclesInserted = vehicles.map(vehicle => {
     return {
-      region: `tmp-${snapshot.realm}`,
+      region: `${snapshot.realm}`,
       gameVersionFull: snapshot.full,
       gameVersion: snapshot.version,
       gameVersionHash: snapshot.hash,

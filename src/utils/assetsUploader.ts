@@ -32,7 +32,7 @@ export function uploader(snapshot: Snapshot, bucket: S3Client) {
     await bucket.send(new PutObjectCommand({
       ...defaultConfig,
       ContentType: contentType,
-      Key: `tmp/${namespace}/latest/${path}`,
+      Key: `${namespace}/latest/${path}`,
       Body: content,
       CacheControl: 'max-age=3600' // 1 hour
     }))
@@ -40,7 +40,7 @@ export function uploader(snapshot: Snapshot, bucket: S3Client) {
     await bucket.send(new PutObjectCommand({
       ...defaultConfig,
       ContentType: contentType,
-      Key: `tmp/${namespace}/${version}/${path}`,
+      Key: `${namespace}/${version}/${path}`,
       Body: content,
       CacheControl: 'max-age=31622400' // 1 year
     }))
