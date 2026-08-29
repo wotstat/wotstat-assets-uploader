@@ -19,8 +19,11 @@ the `sources` tree.
 
 `.github/workflows/upload-snapshot.yml` is called by `game-unpack-pipeline`. Its interface accepts
 the dedicated JIT runner label, sealed snapshot path, expected snapshot identity and descriptor
-digest, target, and the name of the caller Environment that owns its settings. The workflow checks
-the immutable handoff before running the uploader.
+digest, and target. The workflow checks the immutable handoff before running the uploader.
+
+The upload job always targets the caller Environment named `wotstat-assets-uploader`. The caller
+must use `secrets: inherit` so that the cross-repository called job can read that Environment's
+secrets; the Environment name is not a workflow input.
 
 The caller Environment must define these secrets:
 

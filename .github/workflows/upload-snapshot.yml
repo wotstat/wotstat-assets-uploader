@@ -23,10 +23,6 @@ on:
         description: Configured game target
         required: true
         type: string
-      configuration_environment:
-        description: Caller environment containing ClickHouse and S3 settings
-        required: true
-        type: string
     outputs:
       upload_state:
         description: Whether the uploader completed all loaders
@@ -46,7 +42,7 @@ jobs:
       - self-hosted
       - ${{ inputs.runner_label }}
     timeout-minutes: 120
-    environment: ${{ inputs.configuration_environment }}
+    environment: wotstat-assets-uploader
     outputs:
       upload_state: ${{ steps.result.outputs.upload_state }}
     steps:
