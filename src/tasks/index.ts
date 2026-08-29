@@ -18,22 +18,36 @@ import { load as loadEquipmentsAndDevicesIcons } from './loaders/equipmentsAndDe
 const s3Client = new S3Client()
 
 export async function load(root: string) {
-
   const snapshot = await parseSnapshotVersion(root)
-
   const i18n = await generateI18n(root, snapshot)
 
-  try { await loadArenas(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
-  try { await loadLootboxes(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
-  try { await loadShells(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
-  try { await loadComp7(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
-  try { await loadSkills(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
-  try { await loadArtefacts(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
-  try { await loadCustomizations(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
-  try { await loadGameVersion(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
-  try { await loadEquipments(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
-  try { await loadOptionalDevices(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
-  try { await loadEquipmentsAndDevicesIcons(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
-  try { await loadVehicles(root, snapshot, i18n, s3Client) } catch (error) { console.error(error) }
+  const loaders = [
+    ['arenas', loadArenas],
+    ['lootboxes', loadLootboxes],
+    ['shells', loadShells],
+    ['comp7', loadComp7],
+    ['skills', loadSkills],
+    ['artefacts', loadArtefacts],
+    ['customizations', loadCustomizations],
+    ['game-version', loadGameVersion],
+    ['equipments', loadEquipments],
+    ['optional-devices', loadOptionalDevices],
+    ['equipment-and-device-icons', loadEquipmentsAndDevicesIcons],
+    ['vehicles', loadVehicles],
+  ] as const
+  const failures: Error[] = []
 
+  for (const [name, loader] of loaders) {
+    try {
+      await loader(root, snapshot, i18n, s3Client)
+      console.log('--------------------------------------')
+    } catch (error) {
+      console.error(`${name} failed`, error)
+      failures.push(error instanceof Error ? error : new Error(String(error)))
+    }
+  }
+
+  if (failures.length > 0) {
+    throw new AggregateError(failures, `${failures.length} uploader task(s) failed`)
+  }
 }

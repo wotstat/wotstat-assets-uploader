@@ -1,0 +1,91 @@
+name: Upload wotstat assets snapshot
+
+on:
+  workflow_call:
+    inputs:
+      runner_label:
+        description: Unique label of the JIT runner reserved for this upload
+        required: true
+        type: string
+      snapshot_path:
+        description: Absolute path to the sealed GameSnapshot on the runner host
+        required: true
+        type: string
+      expected_snapshot_id:
+        description: GameSnapshot identity returned by the builder
+        required: true
+        type: string
+      expected_descriptor_sha256:
+        description: SHA-256 of snapshot.json returned by the builder
+        required: true
+        type: string
+      target:
+        description: Configured game target
+        required: true
+        type: string
+      configuration_environment:
+        description: Caller environment containing ClickHouse and S3 settings
+        required: true
+        type: string
+    outputs:
+      upload_state:
+        description: Whether the uploader completed all loaders
+        value: ${{ jobs.upload.outputs.upload_state }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: wotstat-assets-uploader-${{ startsWith(inputs.target, 'mt-') && 'mt' || 'wot' }}
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    name: Upload ${{ inputs.target }}
+    runs-on:
+      - self-hosted
+      - ${{ inputs.runner_label }}
+    timeout-minutes: 120
+    environment: ${{ inputs.configuration_environment }}
+    outputs:
+      upload_state: ${{ steps.result.outputs.upload_state }}
+    steps:
+      - name: Check out pinned uploader
+        uses: actions/checkout@v7.0.1
+        with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          persist-credentials: false
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version: 1.4.0
+
+      - name: Install uploader
+        run: bun install --frozen-lockfile
+
+      - name: Verify sealed snapshot handoff
+        env:
+          DATA_DIR: ${{ inputs.snapshot_path }}
+          EXPECTED_SNAPSHOT_ID: ${{ inputs.expected_snapshot_id }}
+          EXPECTED_DESCRIPTOR_SHA256: ${{ inputs.expected_descriptor_sha256 }}
+          EXPECTED_TARGET: ${{ inputs.target }}
+        run: bun run scripts/verify-snapshot-handoff.ts
+
+      - name: Upload assets and data
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_ENDPOINT_URL: ${{ vars.AWS_ENDPOINT_URL }}
+          AWS_BUCKET: ${{ vars.AWS_BUCKET }}
+          CLICKHOUSE_HOST: ${{ vars.CLICKHOUSE_HOST }}
+          CLICKHOUSE_USER: ${{ vars.CLICKHOUSE_USER }}
+          CLICKHOUSE_PASSWORD: ${{ secrets.CLICKHOUSE_PASSWORD }}
+          DATA_DIR: ${{ inputs.snapshot_path }}
+        run: bun run start
+
+      - name: Record upload result
+        id: result
+        run: echo 'upload_state=uploaded' >>"${GITHUB_OUTPUT}"
