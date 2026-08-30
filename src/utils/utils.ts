@@ -20,10 +20,13 @@ export async function parseSnapshotVersion(root: string): Promise<Snapshot> {
   const versionMeta = await parseStringPromise(versionText, { explicitArray: false, trim: true })
   const version = versionMeta['version.xml'].version
 
-  const main = version.split(' ')[0] as string
-  const hash = version.split(' ')[1].replace('#', '')
+  const versionMatch = /^v\.([0-9]+(?:\.[0-9]+){3})(?: [A-Za-z]+(?: [A-Za-z]+)*)? #([0-9]+)$/.exec(version)
+  if (versionMatch === null) throw new Error(`Invalid game version: ${version}`)
 
-  const parts = main.split('.').slice(1)
+  const main = versionMatch[1]!
+  const hash = versionMatch[2]!
+
+  const parts = main.split('.')
   const comp = Number.parseInt(parts.map(t => t.padStart(2, '0')).join('')) * 1e5 + Number.parseInt(hash)
 
   const realm = versionMeta['version.xml'].meta.realm
