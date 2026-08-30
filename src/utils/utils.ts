@@ -27,7 +27,7 @@ export async function parseSnapshotVersion(root: string): Promise<Snapshot> {
   const comp = Number.parseInt(parts.map(t => t.padStart(2, '0')).join('')) * 1e5 + Number.parseInt(hash)
 
   const realm = versionMeta['version.xml'].meta.realm
-  const vendor = realm == 'PT_RU' || realm == 'RU' ? 'mt' : 'wot'
+  const vendor = realm == 'PT_RU' || realm == 'RPT' || realm == 'RU' ? 'mt' : 'wot'
 
   return {
     full: version,
