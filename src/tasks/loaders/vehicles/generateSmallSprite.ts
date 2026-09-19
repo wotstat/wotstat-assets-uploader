@@ -3,6 +3,7 @@ import { uploader } from '@/utils/assetsUploader'
 import { filenameAndExtension, I18n, type Snapshot as Snapshot } from '../../../utils/utils'
 import sharp, { type OverlayOptions } from 'sharp'
 import { createSpriteAtlas } from '@/utils/spriteAtlas'
+import { retryS3Read } from '@/utils/retryS3Read'
 
 
 type Uploader = ReturnType<typeof uploader>
@@ -41,11 +42,11 @@ async function loadExistingKeys(bunClient: S3Client, game: 'mt' | 'wot') {
   let data: string[] = []
 
   do {
-    const list = await bunClient.list({
+    const list = await retryS3Read(() => bunClient.list({
       prefix: `${game}/latest/vehicles/small/`,
       continuationToken,
       maxKeys: 1000
-    })
+    }))
 
     continuationToken = list.nextContinuationToken
     data.push(...list.contents?.map(item => item.key) ?? [])
@@ -56,7 +57,13 @@ async function loadExistingKeys(bunClient: S3Client, game: 'mt' | 'wot') {
 }
 
 export async function generateSmallSprite(root: string, game: 'mt' | 'wot', upload: Uploader, resolutions: number[]) {
-  const bunClient = new S3Client({ endpoint: Bun.env.AWS_ENDPOINT_URL })
+  const bunClient = new S3Client({
+    endpoint: Bun.env.AWS_ENDPOINT_URL,
+    accessKeyId: Bun.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: Bun.env.AWS_SECRET_ACCESS_KEY,
+    bucket: Bun.env.AWS_BUCKET,
+    region: Bun.env.AWS_REGION
+  })
   const maxResolution = Math.max(...resolutions)
 
   const keys = (await loadExistingKeys(bunClient, game)).filter(key => key.endsWith('.png'))
@@ -68,7 +75,10 @@ export async function generateSmallSprite(root: string, game: 'mt' | 'wot', uplo
     .filter(t => !t.includes('/atlas/'))
 
   const loaded = new Map<string, Buffer | string>()
-  for (const element of needToLoad) loaded.set(filenameAndExtension(element).nameWithoutExt, Buffer.from(await bunClient.file(element).bytes()))
+  for (const element of needToLoad) {
+    const bytes = await retryS3Read(() => bunClient.file(element).bytes())
+    loaded.set(filenameAndExtension(element).nameWithoutExt, Buffer.from(bytes))
+  }
   for (const element of small) loaded.set(imageName(element), element)
 
   const smallNoImage = Bun.file(`${root}/sources/base/res/gui/maps/icons/vehicle/small/noImage.png`)
