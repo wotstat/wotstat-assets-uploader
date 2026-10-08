@@ -37,7 +37,10 @@ function getRoleFromTags(tags: string[]) {
 }
 
 async function getVehicles(root: string, i18n: I18n,) {
-  const glob = new Glob(`${root}/sources/base/res/scripts/item_defs/vehicles/*/list.xml`)
+  const files = [
+    `${root}/sources/base/res/scripts/item_defs/vehicles/*/list.xml`,
+    `${root}/sources/base/res/*/scripts/item_defs/vehicles/*/list.xml`
+  ].flatMap(pattern => [...new Glob(pattern).scanSync()])
 
   const vehicles: {
     tag: string,
@@ -51,7 +54,7 @@ async function getVehicles(root: string, i18n: I18n,) {
     shortNameLocalization: Record<string, string>
   }[] = []
 
-  for (const file of glob.scanSync()) {
+  for (const file of files) {
     const nation = file.split('/').at(-2)!
 
     const data = await Bun.file(file).text()
